@@ -12,3 +12,5 @@ RUN curl -sS https://getcomposer.org/installer | php \
     && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
 
 WORKDIR /var/www/api
+
+COPY .env.example .env

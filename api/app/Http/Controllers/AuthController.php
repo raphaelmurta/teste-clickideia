@@ -36,10 +36,12 @@ class AuthController extends Controller
 
     private function respondWithToken($token)
     {
+        $user = Auth::user();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard('api')->factory()->getTTL() * 60
+            'expires_in' => Auth::guard('api')->factory()->getTTL() * 60,
+            'role' => $user->role,
         ]);
     }
 
