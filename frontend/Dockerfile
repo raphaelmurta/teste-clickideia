@@ -1,6 +1,6 @@
-FROM node:20-alpine
-WORKDIR /app
-COPY . .
+FROM node:alpine
+WORKDIR /var/www/frontend
+COPY ./package.json ./
 RUN npm install
-RUN npm run build
-ENTRYPOINT npm start
+COPY . .
+CMD ["npm", "run", "start"]

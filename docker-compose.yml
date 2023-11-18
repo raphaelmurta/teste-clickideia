@@ -3,11 +3,12 @@ version: '3.9'
 services:
   frontend:
     container_name: frontend
-    image: node:18
-    working_dir: /var/www/frontend
+    build:
+        context: ./frontend
     volumes:
       - ./frontend:/var/www/frontend
-    entrypoint: [ 'npm' ]
+    networks:
+        - app-network
 
   api:
     container_name: api
@@ -26,7 +27,7 @@ services:
     image: nginx:stable-alpine
     ports:
       - "8080:80"
-      - "8090:8090"
+      - "3000:3000"
     volumes:
       - ./api:/var/www/api
       - ./frontend:/var/www/frontend
@@ -34,6 +35,7 @@ services:
       - ./config/nginx/frontend.conf:/etc/nginx/conf.d/frontend.conf
     depends_on:
       - api
+      - frontend
       - db
     networks:
       - app-network
