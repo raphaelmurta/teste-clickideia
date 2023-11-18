@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  frontend:
+    container_name: frontend
+    image: node:18
+    working_dir: /var/www/frontend
+    volumes:
+      - ./frontend:/var/www/frontend
+    entrypoint: [ 'npm' ]
+
+  api:
+    container_name: api
+    build:
+        context: ./api
+    restart: unless-stopped
+    working_dir: /var/www/api
+    volumes:
+        - ./api:/var/www/api
+    user: 1000:1000
+    networks:
+        - app-network
+
+  nginx:
+    container_name: nginx
+    image: nginx:stable-alpine
+    ports:
+      - "8080:80"
+      - "8090:8090"
+    volumes:
+      - ./api:/var/www/api
+      - ./frontend:/var/www/frontend
+      - ./config/nginx/api.conf:/etc/nginx/conf.d/api.conf
+      - ./config/nginx/frontend.conf:/etc/nginx/conf.d/frontend.conf
+    depends_on:
+      - api
+      - db
+    networks:
+      - app-network
+
+  db:
+    container_name: db
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+        MYSQL_DATABASE: clickideia
+        MYSQL_USER: user
+        MYSQL_PASSWORD: password
+        MYSQL_ROOT_PASSWORD: clickideia
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+        - "3306:3306"
+    networks:
+        - app-network
+
+networks:
+    app-network:
+        driver: bridge
