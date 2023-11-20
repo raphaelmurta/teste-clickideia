@@ -22,6 +22,7 @@ const Login = () => {
         setLoading(true);
         try {
             const response = await login(email, password);
+
             localStorage.setItem('access_token', response.access_token);
             localStorage.setItem('role', response.role);
             navigate('/dashboard');

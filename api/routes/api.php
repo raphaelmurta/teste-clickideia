@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ListsController;
+use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\QuestionListController;
+use App\Http\Controllers\SubjectController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +20,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post('/login', AuthController::class . '@login');
+Route::post('/logout', AuthController::class . '@logout');
 
-Route::group(['middleware' => ['auth:api']], function () {
+Route::apiResource('subjects', SubjectController::class);
+Route::apiResource('questions', QuestionController::class);
+Route::apiResource('question-lists', QuestionListController::class);
 
-});

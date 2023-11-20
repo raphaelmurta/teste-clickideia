@@ -10,6 +10,7 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route
+                jwtCheck
                 path="/dashboard"
                 element={
                     <AuthMiddleware

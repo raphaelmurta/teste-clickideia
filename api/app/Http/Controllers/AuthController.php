@@ -2,52 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\LoginAuthRequest;
 use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function __construct()
     {
-        $credentials = $this->getCredentials($request);
+        $this->middleware('auth:api', ['except' => ['login']]);
+    }
 
-        if ($this->authenticate($credentials)) {
-            return $this->respondWithToken($this->createToken());
+    public function login(LoginAuthRequest $request)
+    {
+
+        $credentials = $request->only('email', 'password');
+        $token = Auth::guard('api')->attempt($credentials);
+
+        if (!$token) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
         }
 
-        return $this->respondUnauthorized();
+        return $this->respondWithToken($token);
     }
 
-    private function getCredentials(Request $request)
+    public function logout()
     {
-        return $request->only('email', 'password');
+        Auth::guard('api')->logout();
+
+        return response()->json(['status' => 'success', 'message' => 'Successfully logged out']);
     }
 
-    private function authenticate(array $credentials)
+    public function refresh()
     {
-        return Auth::attempt($credentials);
+        // Gerar um novo token
+        return $this->respondWithToken(Auth::guard('api')->refresh());
     }
 
-    private function createToken()
+    protected function respondWithToken($token)
     {
-        return JWTAuth::fromUser(Auth::user());
-    }
-
-    private function respondWithToken($token)
-    {
-        $user = Auth::user();
         return response()->json([
+            'status' => 'success',
+            'type' => 'bearer',
             'access_token' => $token,
-            'token_type' => 'bearer',
             'expires_in' => Auth::guard('api')->factory()->getTTL() * 60,
-            'role' => $user->role,
+            'role' => Auth::guard('api')->user()->role,
         ]);
     }
-
-    private function respondUnauthorized()
-    {
-        return response()->json(['error' => 'Unauthorized'], 401);
-    }
 }
-

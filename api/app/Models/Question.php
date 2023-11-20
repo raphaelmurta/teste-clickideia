@@ -6,11 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Question extends Model
 {
-    protected $fillable = ['content', 'list_id'];
+    protected $fillable = ['subject', 'question_text', 'response_field'];
 
-    public function list()
+
+    public function subject()
     {
-        return $this->belongsTo(Lists::class);
+        return $this->belongsTo(Subject::class);
+    }
+
+    public function lists()
+    {
+        return $this->belongsToMany(QuestionList::class, 'question_list_question');
     }
 
 }
