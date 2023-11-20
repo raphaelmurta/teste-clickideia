@@ -22,7 +22,7 @@ class StoreQuestionRequest extends FormRequest
     public function rules()
     {
         return [
-            'subject' => 'required|string',
+            'subject_id' => 'required|integer|exists:subjects,id',
             'question_text' => 'required|string',
         ];
     }

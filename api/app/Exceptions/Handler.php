@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Auth\AuthenticationException;
 use Throwable;
@@ -32,6 +33,18 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         return response()->json(['error' => 'Unauthenticated.'], 401);
+    }
+
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof QueryException) {
+            $errorCode = $exception->errorInfo[1];
+            if ($errorCode == 1452) {
+                return response()->json(['error' => 'Recurso relacionado não encontrado.'], 400);
+            }
+        }
+
+        return parent::render($request, $exception);
     }
 
 
